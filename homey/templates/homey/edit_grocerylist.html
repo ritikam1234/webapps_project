@@ -1,0 +1,46 @@
+{% extends 'homey/base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+<div id="id_page_name" class="text-center mb-4"> 
+<h1>Edit Item</h1>
+</div>
+<div class="bg-light p-5 rounded shadow">
+    <form enctype="multipart/form-data" method="post" action="{% url 'edititem' item.id %}">
+        {% csrf_token %}
+        <div class = "row mb-3 align-items-center">
+        <div class="row">
+            <div class="col">
+                <div class="bg-light p-4 rounded shadow">
+                    <div class="row mb-3 align-items-center">
+                        <label class="col-sm-2 text-end" style="width:150px;">Item</label>
+                        <div class = "col-sm-8">
+                            {{ form.text }}
+                        </div>
+                    </div>
+                    <div class="row mb-3 align-items-center">
+                        <label class="col-sm-2 text-end" style="width:150px;">Quantity</label>
+                        <div class="col-sm-4">
+                            {{ form.quantity }}
+                        </div>
+                    </div>
+                    <div class="row mb-3 align-items-center">
+                        <label class="col-sm-2 text-end" style="width:150px;">Units</label>
+                        <div class="col-sm-4">
+                            {{ form.units }}
+                        </div>
+                    </div>
+                <div class="text-center mt-3">
+                <button class="btn btn-lg mt-4" style="background-color: #72a891; width:10vw;" type="submit">Save Changes</button>
+                <button class="btn btn-lg mt-4" style="background-color: #72a891; width:7vw;" type="submit">Cancel</button>
+                </div>
+                </div>
+            </div>      
+            </div>
+        </div>
+    </form>
+</div>
+
+
+
+{% endblock %}

@@ -1,0 +1,11 @@
+img {
+    max-width:30%;
+    max-height: auto;
+}
+#id_bio_input_text {
+    text-align: center;
+}
+
+.error {
+    color: red;
+}

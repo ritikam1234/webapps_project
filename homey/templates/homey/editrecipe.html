@@ -1,0 +1,183 @@
+{% extends "homey/base.html" %}
+
+{% block content %}  
+<div class="container mt-5">
+    <div id="id_page_name" class="text-center mb-4"> 
+        <h1>Edit Recipe</h1>
+    </div>
+
+    <div class="bg-light p-5 rounded shadow">
+        <form enctype="multipart/form-data" method="post" action="{% url 'update-recipe' recipe.id %}">
+            {% csrf_token %}
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="row mb-3 align-items-center">
+                        <label class="col-md-6 text-end" style="width:100px;">Title</label>
+                        <div class="col-md-6">
+                            {{ form.title }}
+                        </div>
+                        <div class="error">
+                            {% for error in form.title.errors %} {{error}} {% endfor %}
+                        </div>
+                    </div>
+                    <div class="row mb-3 align-items-center">
+                        <label class="col-sm-4 text-end" style="width:100px;">Ingredients</label>
+                        <ul id="ingredient-list">
+                            <!-- Dynamically added ingredients go here -->
+                        </ul>
+                        <ul id="ingredient-list">
+
+                        </ul>
+                        <div id="ingredient-error" class="text-danger"></div>
+                        <div>
+                            <input type="text" id="ingredient-name" placeholder="Ingredient Name" class="form-control">
+                            <input type="number" id="ingredient-quantity" placeholder="Quantity" value="1" step="0.1" class="form-control">
+                            <input type="text" id="ingredient-units" placeholder="Units" value="items" class="form-control">
+                            <button type="button" onclick="addIngredient()" class="btn btn-primary mt-2">Add Ingredient</button>
+                        </div>
+    
+                        <input type="hidden" name="ingredients" id="ingredients-data">
+                        <div class="error">
+                            {% for error in form.list_ingredient.errors %} {{error}} {% endfor %}
+                        </div>
+                    </div>
+                    <div class="row mb-3 align-items-center">
+                        <label class="col-sm-4 text-end" style="width:100px;">Steps</label>
+                        <div class="col-md-6">
+                            {{ form.steps }}
+                        </div>
+                        <div class="error">
+                            {% for error in form.steps.errors %} {{error}} {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column for Tags Selection -->
+                <div class="col-md-6">
+                    <h5>Tags</h5>
+                    <div class="row mb-3 align-items-center">
+                        <div class="col-md-6">
+                            {{ form.tags }}
+                        </div>
+                    </div>
+                    <div class="row mb-3 align-items-center">
+                        <!-- <label class="col-sm-4 col-form-label text-end">Image</label> -->
+                        <div class="col-md-6">
+                            {{ form.picture }}
+                        </div>
+                        <div class="error">
+                            {% for error in form.picture.errors %} {{error}} {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+
+            <div class="text-center mt-4">
+                <button type="submit" class="btn btn-lg mt-3" style="background-color: #72a891;">Post Recipe</button>
+            </div>
+        </form>
+    </div>
+</div>
+<script type="text/javascript">
+    let ingredientList = []
+    var count = 0;
+
+    function deleteIngredient(id) {
+        console.log("deleting recipe...")
+
+        const index = ingredientList.findIndex(ingredient => ingredient.id === id);
+        console.log(index)
+        if (index > -1) {
+            console.log(ingredientList)
+            console.log("in if")
+            ingredientList.splice(index, 1);
+        }
+
+        $(`#id_ingredient_${id}`).remove();
+        $("#ingredients-data").val(JSON.stringify(ingredientList));
+        console.log($("#ingredients-data").val(JSON.stringify(ingredientList)))
+    }
+
+
+    function populateIngredients(IngredientVal) {
+        
+        let ingredient = {
+        id: count, 
+        name: IngredientVal.name,
+        quantity: IngredientVal.quantity,
+        units: IngredientVal.units
+        };
+
+        count +=1
+        ingredientList.push(ingredient);
+        let deleteButton = `<button onclick='deleteIngredient(${ingredient.id})'>X</button>`;
+    let details = `<span class="details">(quantity=${ingredient.quantity}, units=${ingredient.units})</span>`;
+        $("#ingredient-list").append(`<li id="id_ingredient_${ingredient.id}" class="ingredient-item">${deleteButton} ${ingredient.name} ${details}</li>`);
+        $("#ingredients-data").val(JSON.stringify(ingredientList));
+    }
+    $(document).ready(function() {
+        let ingredientArray = JSON.parse('{{ ingredients }}'.replace(/&#x27;/g, '"')  )
+        ingredientArray.forEach(function(ingredient) {
+            populateIngredients(ingredient);
+            });
+    });
+
+    console.log("here", ingredientList);
+    function displayError(message) {
+    $("#error").html(message);
+}
+function addIngredient() {
+    console.log("adding ingredient...")
+
+    let ingredientName = $("#ingredient-name").val();
+    let ingredientQuantity = $("#ingredient-quantity").val();
+    let ingredientUnits = $("#ingredient-units").val();
+
+
+    if (!ingredientName || !ingredientQuantity || !ingredientUnits) {
+        if (!ingredientName) {
+            $("#ingredient-name").attr("placeholder", "please add an ingredient");
+            return;
+        }
+        if (!ingredientQuantity) {
+            $("#ingredient-quantity").attr("placeholder", "please add a quantity");
+            return;
+        }
+        if (!ingredientUnits) {
+            $("#ingredient-units").attr("placeholder", "please add units");
+            return;
+        }
+        return;
+    }
+    $("#ingredient-name").val("");
+    $("#ingredient-quantity").val("1");
+    $("#ingredient-units").val("items");
+
+
+    let ingredient = {
+        id: count, // temp id
+        name: ingredientName,
+        quantity: ingredientQuantity,
+        units: ingredientUnits
+    };
+    count +=1
+
+    ingredientList.push(ingredient);
+
+
+    $("#ingredient-list").append(makeIngredientHTML(ingredient));
+    $("#ingredients-data").val(JSON.stringify(ingredientList));
+}
+
+function makeIngredientHTML(ingredient) {
+    console.log("make ingredient html...")
+    let deleteButton = `<button onclick='deleteIngredient(${ingredient.id})'>X</button>`;
+    let details = `<span class="details">(quantity=${sanitize(ingredient.quantity)}, units=${sanitize(ingredient.units)})</span>`;
+    return `<li id="id_ingredient_${ingredient.id}" class="ingredient-item">${deleteButton} ${sanitize(ingredient.name)} ${details}</li>`;
+}
+</script>
+{% endblock %}
+
+

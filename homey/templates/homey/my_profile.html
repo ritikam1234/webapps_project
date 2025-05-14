@@ -1,0 +1,17 @@
+{% extends "homey/base.html" %}
+
+    {% block content %}   
+    <div class="container mt-5 align-items-center">
+        <div id="id_page_name" class="text-center mb-4"> 
+            <h1>Welcome to Homey,  {{user.first_name}} {{user.last_name}}</h1>
+            <p class="lead">News Feed</p>
+        </div>  
+    </div>
+    <div id = "my-events-go-here" >
+        <span id="errors" class="error"></span>
+    </div>
+    <script type="text/javascript">
+        window.onload=getEvents
+        window.setInterval(getEvents, 5000);
+    </script>
+    {% endblock %}

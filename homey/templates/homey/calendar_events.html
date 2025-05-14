@@ -1,0 +1,162 @@
+{% extends "homey/base.html" %}
+
+{% block content %}  
+
+<div class="container mt-5">
+    <div id="id_page_name" class="text-center mb-4"> 
+        <h1>Calendar Events</h1>
+        <p class="lead">Schedule a cooking or shopping event with your friends!</p>
+    </div>
+    
+    <div class="bg-light p-5 rounded shadow">
+        <form enctype="multipart/form-data" method="post" action="{% url 'calendar_events' %}">
+            {% csrf_token %}
+            
+            <div class="row">
+                <div class="col">
+                    <h6 class="text-center">Create an Event!</h1>
+                    <div class="bg-light p-5 rounded shadow">
+                        <div class="row mb-3 align-items-center">
+                            <label class="col-sm-4 text-end" style="width:150px;">Event Title</label>
+                            <div class="col">
+                                {{ form.title }}
+                            </div>
+                        </div>
+                        <div class="row mb-0 align-items-center">
+                            <label class="col-sm-1 text-end" style="width:150px;">Description</label>
+                            <div class="col">
+                            {{ form.summary }}
+                            </div>
+                        </div>
+                        <div class="row mb-3 align-items-center">
+                            <label class="col-sm-4 text-end" style="width:150px;">Date</label>
+                            <div class="col">
+                                {{ form.date }}
+                            </div>
+                            <div class="error col-mb-3 text-end">
+                                {% for error in form.date.errors %} {{error}} {% endfor %}
+                            </div>
+                        </div>
+                        <div class="row mb-3 align-items-center">
+                            <label class="col-sm-4 text-end" style="width:150px;">Start Time</label>
+                            <div class="col">
+                                {{ form.start }}
+                            </div>
+                            <div class="error col-mb-3 text-end">
+                                {% for error in form.start.errors %} {{error}} {% endfor %}
+                            </div>
+                        </div>
+                        <div class="row mb-3 align-items-center">
+                            <label class="col-sm-4 text-end" style="width:150px;">End Time</label>
+                            <div class="col">
+                                {{ form.end }}
+                            </div>
+                            <div class="error col-mb-3 text-end">
+                                {% for error in form.end.errors %} {{error}} {% endfor %}
+                            </div>
+                        </div>
+                        <div class="row mb-3 align-items-center">
+                            <label class="col-sm-4 text-end" style="width:150px;">Location</label>
+                            <div class="col">
+                                {{ form.location }}
+                            </div>
+                        </div>
+                        <div class="row mb-3 align-items-center">
+                            <label class="col-sm-4 text-end" style="width:150px;">Attendees</label>
+                            <div class="col">
+                                {{ form.attendees }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- col to toggle through upcoming events? -->
+                <div class="col" >
+                    <div class="row mb-3 align-items-center">
+                        <h6 class="text-center">Created Events</h1>
+                        <div class="bg-light p-5 rounded shadow">
+                            {% if event %}
+                                <div class="col text-center">
+                                    Title: {{event.title}} <div></div>
+                                    Time: {{event.start}} to {{event.end}}
+                                    Date: {{event.date}}
+                                    <a href = "{{eventlink}}">Link to your event!</a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row mb-3 align-items-center"></div>
+                        <h6 class="text-center">Upcoming Events</h1>
+                        <div class="bg-light p-5 rounded shadow">
+                        <div id="carousel_controls" class="carousel slide" data-bs-ride="carousel">
+                            <div class="carousel-inner">
+                                {% for event in newevents %}
+                                    {% if forloop.first %}
+                                    <div class="carousel-item active">
+                                        <div class="col text-center">{{event.title}} - {{event.start}} to {{event.end}} on {{event.date}}</div>               
+                                    </div>
+                                    {% else %}
+                                    <div class="carousel-item">
+                                        <div class="col text-center">{{event.title}} - {{event.start}} to {{event.end}} on {{event.date}}</div>
+                                    </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                            <a class="carousel-control-prev" href="#carousel_controls" role="button" data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                <span class="sr-only" style="color:#72a891;">Previous</span>
+                            </a>
+                            <a class="carousel-control-next" href="#carousel_controls" role="button" data-bs-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span class="sr-only" style="color:#72a891;">Next</span>
+                            </a>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <button type="submit" class="btn btn-lg mt-3" style="background-color: #72a891;">Create Your Event!</button>
+            </div>
+
+            <!-- {% for error in form.errors %} 
+                <div class="error">{{ error }}</div>
+            {% endfor %} -->
+        </form>
+    </div>
+
+    
+<!-- 
+    <table>
+        <tbody>
+            <div><br></div>
+
+            {% for item in newevents %}
+                Event #{{ forloop.counter }}
+                <br>
+                Summary: {{item.summary}}
+                <br>
+                Start Time: {{item.start}}
+                <br>
+                End Time: {{item.end}}
+                <br>
+                Date: {{item.date}}
+                <br>
+                <a href = "{{item.eventlink}}">Event link</a>
+                <br><br>
+            {% endfor %}
+
+
+        </tbody>
+    </table>
+
+
+        <ul>
+            
+            
+            {% for event in events %}
+                <li>{{ event.summary }} - {{ event.start_time }} to {{ event.end_time }}</li>
+            {% endfor %}
+        </ul> -->
+{% endblock %}

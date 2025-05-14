@@ -1,0 +1,122 @@
+{% extends "homey/base.html" %}
+
+    {% block content %} 
+    {% load static %}
+    <div id="recipe_title" class="container p-5 text-center"> 
+        <h1> {{recipe.title}} </h1>
+        <a id="id_profile_link" href="{% url 'other_profile' recipe.user.id %}">
+            {{recipe.user.first_name}} {{recipe.user.last_name}}
+        </a>
+        <div>
+            Created at {{recipe.creation_time|date:"n/j/Y g:i A"}}
+        </div>
+    </div>
+    <div id="recipe_content" class="container bg-light">
+        <div id="recipe_picture" class="container bg-light p-3">
+            <img id="recipe_picture" src="{% url 'recipe-picture' recipe.id %}">
+        </div>
+        <div id = "recipe_ingredients">
+            <h5>Ingredients</h5>
+            <table>
+            <thead>
+                <tr>
+                    <th>Ingredient</th>
+                    <th>Quantity</th>
+                    <th>Units</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ingredient in ingredients %}
+                <tr>
+                    <td>
+                        {{ ingredient.name }}
+                    </td>
+                    <td>{{ ingredient.quantity }}</td>
+                    <td>{{ ingredient.units }}</td>
+                    <td><a href="{% url 'create_grocery_item' %}?name={{ ingredient.name }}&quantity={{ ingredient.quantity }}&units={{ ingredient.units }}">
+                        Add to Grocery List
+                    </a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        </div>
+        <div id="recipe_steps">
+            <h5>Steps</h5>
+            {{recipe.steps|linebreaks}}
+        </div>
+        <span>Rating: {{recipe.average_rating}} </span>
+        <div id="recipe_tags">
+            Tags: {{recipe.tags}}
+        </div>
+    </div>
+    <div class="container p-3 bg-light">
+        {% if bookmarked is True %}
+            <form action="{% url 'unbookmark' recipe.id %}" method="POST">
+                <input id="id_unbookmark" type="image" src="{% static 'homey/bookmarked.png' %}" alt="Remove bookmark" width="30" height="39">
+                {% csrf_token %}
+            </form>
+        {% elif bookmarked is False %}
+            <form action="{% url 'bookmark' recipe.id %}" method="POST">
+                <input id="id_bookmark" type="image" src="{% static 'homey/notbookmarked.png' %}" alt="Bookmark recipe" width="30" height="39">
+                {% csrf_token %}
+            </form>
+        {% endif %}
+        {% if myrecipe %}
+            <form action="{% url 'edit-recipe' recipe.id %}" method="POST">
+                <button id="id_edit_recipe">Edit Recipe</button>
+                {% csrf_token %}
+            </form>
+        {% endif %}
+        <br>
+        <form action="{% url 'add-to-calendar' recipe.id%}" method="POST">
+            <button id="id_add_to_calendar">I made this today :)</button>
+            {% csrf_token %}
+        </form>
+    </div>
+
+
+    <div id="reviews" class="container p-3 bg-light">
+        <h3>{{reviews|length}} Reviews</h3>
+        <div id= "my-reviews-go-here">
+            <span id='error' class='error'></span>
+        </div>
+        <script>
+            var recipeid = '{{ recipe.id }}'
+            window.onload = getReviews(recipeid)
+            window.setInterval( ()=>{ getReviews(recipeid); }, 5000);
+            // window.setInterval(getReviews(recipeid), 5000);
+        </script>
+    </div>
+    <div class="container p-3 bg-light">
+        {% if error %}
+        <div class="error" id="reviewerror">
+            <script>
+                alert('{{error}}')
+            </script>
+        </div>
+        {% endif %}
+        
+        {% if reviewform %}
+        <div class = "container p-3 bg-light">
+            <h3> Post a review </h3>
+            <form enctype="multipart/form-data" method="post" action="{% url 'new-review' recipe.id %}">
+            <table>
+                {% for field in reviewform.visible_fields %}
+                    <tr>
+                        <td>{{field.label_tag}}</td>
+                        <td>{{field}}</td>
+                        <td class="error">
+                            {% for error in field.errors %} {{error}} {% endfor %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary btn-lg">Post Review</button>
+            </form>
+        </div>
+        {% endif %}
+
+    </div>
+    {% endblock %}

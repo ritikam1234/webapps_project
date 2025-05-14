@@ -1,0 +1,101 @@
+{% extends "homey/base.html" %}
+
+    {% block content %}   
+    <div class="container mt-5 align-items-center">
+        <div id="id_page_name" class="text-center mb-4"> 
+            <h1>Dashboard</h1>
+            <p class="lead">Profile Page for {{user.first_name}} {{user.last_name}}</p>
+            <p>User since {{profile.user_since| date:"n/j/Y"}}</p>
+        </div>  
+
+        <form enctype="multipart/form-data" action="{% url 'update-dashboard' %}" method="POST">
+            <div class="d-flex justify-content-center">  
+                <div class="bg-light p-5 rounded shadow col-md-6">
+                    <div class="col text-center">
+                        {{ form.bio }}
+                    </div>
+                </div>
+            </div>
+            {% csrf_token %}
+            <div class="d-flex justify-content-center mt-3">
+                <button class="btn btn-primary" id="id_update_profile_button" type="submit" style="background-color: #72a891;">Submit</button>
+            </div>
+            <div><br> </div>
+            
+        </form>
+
+        <div class="row mb-3 align-items-center">
+            <div class="d-flex justify-content-center">  
+                <div class="bg-light p-5 rounded shadow col-md-6">
+                <h6 class="text-center">Bookmarked Recipes</h6>
+
+                <div id="carousel_controls" class="carousel slide" data-bs-ride="carousel">
+                    <div class="carousel-inner">
+                        {% if bookmarked_recipes %}
+                        {% for recipe in bookmarked_recipes %}
+                            {% if forloop.first %}
+                            <div  class="carousel-item active col text-center">
+                                <a href="{% url 'recipe' recipe.id %}">{{recipe.title}} </a>
+                                <p>Rating: {{recipe.average_rating}}</p>
+                            </div>
+                            {% else %}
+                            <div class="carousel-item col text-center">
+                                <a href="{% url 'recipe' recipe.id %}">{{recipe.title}}</a>
+                                <p>Rating: {{recipe.average_rating}}</p>
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+                    <a class="carousel-control-prev" href="#carousel_controls" role="button" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="sr-only" style="color:#72a891;">Previous</span>
+                    </a>
+                    <a class="carousel-control-next" href="#carousel_controls" role="button" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="sr-only" style="color:#72a891;">Next</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+        
+        
+    <div class="row mb-3 align-items-center">
+        <div class="d-flex justify-content-center">  
+            <div class="bg-light p-5 rounded shadow col-md-6">
+            <h6 class="text-center">Created Recipes</h6>
+
+            <div id="carousel_controls1" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    {% if recipes %}
+                    {% for recipe in recipes %}
+                        {% if forloop.first %}
+                        <div  class="carousel-item active col text-center">
+                            <a href="{% url 'recipe' recipe.id %}">{{recipe.title}} </a>
+                            <p>Rating: {{recipe.average_rating}}</p>
+                        </div>
+                        {% else %}
+                        <div class="carousel-item col text-center">
+                            <a href="{% url 'recipe' recipe.id %}">{{recipe.title}}</a>
+                            <p>Rating: {{recipe.average_rating}}</p>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                    {% endif %}
+                </div>
+                <a class="carousel-control-prev" href="#carousel_controls1" role="button" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="sr-only" style="color:#72a891;">Previous</span>
+                </a>
+                <a class="carousel-control-next" href="#carousel_controls1" role="button" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="sr-only" style="color:#72a891;">Next</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+    {% endblock %}
+    
